@@ -417,6 +417,24 @@ function createStructuralDiagnostics(deps) {
             return getMultilineTerminalKindEndingAt(lineNumber, scanBounds.start, currentDepth);
         };
         const isSingleStatementControlledBodyLine = lineNumber => {
+            // A control header that already carries its own non-empty inline body
+            // (e.g. `if (cond) return x` written without a trailing semicolon) is a
+            // COMPLETE statement; the following line is its sibling, not its
+            // controlled body. Mirrors the empty-inline-body check the first branch
+            // below already performs.
+            const controlHeaderHasInlineBody = (text, keyword, keywordStart) => {
+                let kw = keyword, start = keywordStart;
+                if (kw === 'else') {
+                    const afterElseStart = skipInlineControlHeader(text, start, 'else');
+                    const afterElse = afterElseStart >= 0 ? text.slice(afterElseStart).trimStart() : '';
+                    if (lineStartsWithKeyword(afterElse, 'if')) {
+                        kw = 'if';
+                        start = text.indexOf('if', afterElseStart);
+                    }
+                }
+                const bodyStart = skipInlineControlHeader(text, start, kw);
+                return bodyStart >= 0 && !!text.slice(bodyStart).trim();
+            };
             const previousBodyLine = getPreviousNonEmptyLine(lineNumber - 1);
             if (previousBodyLine >= 0) {
                 const previousTrimmed = getTrimmedStructuralLine(previousBodyLine);
@@ -465,6 +483,11 @@ function createStructuralDiagnostics(deps) {
                     statement.firstKeyword === 'else' ||
                     statement.firstKeyword === 'do'
                 ) {
+                    // A control header with its own inline body is a complete
+                    // statement; the tested line is its sibling, not its body.
+                    if (controlHeaderHasInlineBody(combined, statement.firstKeyword, statement.firstKeywordStart)) {
+                        return false;
+                    }
                     return true;
                 }
                 const previousLine = getPreviousNonEmptyLine(probeLine - 1);
