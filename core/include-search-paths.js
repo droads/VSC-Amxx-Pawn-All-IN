@@ -154,6 +154,7 @@ function collectCompilerIncludeDirectories(options = {}) {
         path,
         sourceFilePath = '',
         projectLocalIncludePaths = ['include'],
+        programmaticIncludePaths = [],
         globalIncludePaths = []
     } = options;
     const deps = {
@@ -170,6 +171,7 @@ function collectCompilerIncludeDirectories(options = {}) {
             normalizeProjectIncludeHints(projectLocalIncludePaths),
             deps
         ),
+        collectConfiguredGlobalIncludeSources(programmaticIncludePaths, sourceFilePath, deps),
         collectConfiguredGlobalIncludeSources(globalIncludePaths, sourceFilePath, deps)
     ], deps);
 }

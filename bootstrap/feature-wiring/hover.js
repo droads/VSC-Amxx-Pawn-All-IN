@@ -19,6 +19,7 @@ function buildHoverFeatures(deps, support) {
         getIncludeFileExtensions,
         getGlobalIncludePaths,
         getProjectLocalIncludePaths,
+        getProgrammaticIncludePaths,
         getPersistentHoverMode,
         isPersistentHoverEnabled,
         isHoverGoToDefinitionLinksEnabled
@@ -113,6 +114,7 @@ function buildHoverFeatures(deps, support) {
         getIncludeFileExtensions,
         getGlobalIncludePaths,
         getProjectLocalIncludePaths,
+        getProgrammaticIncludePaths,
         t,
         buildCommandLink: support.buildCommandLink,
         getWordAtPosition,

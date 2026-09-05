@@ -17,6 +17,7 @@ function buildCoreActivationRuntime(deps) {
         context,
         t,
         settingsService,
+        programmaticIncludePathsService,
         state,
         liveValidationOutputChannel = null
     } = deps;
@@ -52,6 +53,11 @@ function buildCoreActivationRuntime(deps) {
         getGlobalIncludePaths,
         getProjectLocalIncludePaths
     } = settingsService;
+    const getProgrammaticIncludePaths = () => (
+        typeof programmaticIncludePathsService?.getProgrammaticIncludePaths === 'function'
+            ? (programmaticIncludePathsService.getProgrammaticIncludePaths() || [])
+            : []
+    );
 
     const syntaxPrelude = createCoreSyntaxPrelude({ t });
     const {
@@ -371,6 +377,7 @@ function buildCoreActivationRuntime(deps) {
         normalizeFsPath,
         getGlobalIncludePaths,
         getProjectLocalIncludePaths,
+        getProgrammaticIncludePaths,
         getIncludeFileExtensions,
         getIncludeDocumentWarmupFileLimit,
         getPersistentIncludeDeclarationCacheMaxBytes,
@@ -452,6 +459,7 @@ function buildCoreActivationRuntime(deps) {
     return createCoreRuntimeBundle({
         t,
         settingsService,
+        programmaticIncludePathsService,
         state,
         syntaxPrelude,
         baseSyntaxRuntime,

@@ -25,6 +25,7 @@ function createHoverRuntimeFeature(deps) {
         getIncludeFileExtensions,
         getGlobalIncludePaths,
         getProjectLocalIncludePaths,
+        getProgrammaticIncludePaths = () => [],
         t,
         buildCommandLink,
         getWordAtPosition,
@@ -105,7 +106,8 @@ function createHoverRuntimeFeature(deps) {
         `links:${isHoverGoToDefinitionLinksEnabled() ? 1 : 0}`,
         `includeExt:${(getIncludeFileExtensions() || []).join(',')}`,
         `global:${(getGlobalIncludePaths() || []).join('|')}`,
-        `project:${(getProjectLocalIncludePaths() || []).join('|')}`
+        `project:${(getProjectLocalIncludePaths() || []).join('|')}`,
+        `programmatic:${(getProgrammaticIncludePaths() || []).join('|')}`
     ].join(';');
 
     const {

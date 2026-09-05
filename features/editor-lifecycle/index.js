@@ -73,7 +73,8 @@ function createEditorLifecycleFeature(deps) {
         themeRecommendationFeature,
         liveValidationTimers,
         getDocumentFingerprint = defaultGetDocumentFingerprint,
-        liveValidationOutputChannel = null
+        liveValidationOutputChannel = null,
+        programmaticIncludePathsService = null
     } = deps;
 
     const INCLUDE_GRAPH_WATCHER_REFRESH_DELAY_MS = 240;
@@ -1044,6 +1045,12 @@ function createEditorLifecycleFeature(deps) {
         }
     }
 
+    const handleProgrammaticIncludePathsChanged = () => {
+        resetCachesAndWarmActiveDocument();
+        refreshOpenPawnDiagnosticsForSettingsChange('programmaticIncludePathsChanged');
+        ensureIncludeGraphWatchers();
+    };
+
     function register() {
         logLifecycle(() =>
             `register mode=${getLiveValidationMode()} scanOnOpen=${shouldRunLiveValidationScanOnOpen() ? 1 : 0}`
@@ -1060,7 +1067,10 @@ function createEditorLifecycleFeature(deps) {
             ...(typeof vscode.window.onDidChangeVisibleTextEditors === 'function'
                 ? [vscode.window.onDidChangeVisibleTextEditors(handleDidChangeVisibleTextEditors)]
                 : []),
-            vscode.workspace.onDidChangeConfiguration(handleDidChangeConfiguration)
+            vscode.workspace.onDidChangeConfiguration(handleDidChangeConfiguration),
+            ...(programmaticIncludePathsService?.onDidChangeIncludePaths
+                ? [programmaticIncludePathsService.onDidChangeIncludePaths(handleProgrammaticIncludePathsChanged)]
+                : [])
         ];
 
         context.subscriptions.push(...subscriptions);

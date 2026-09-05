@@ -4,3 +4,6 @@
 
 /ARCHITECTURE.md
 /AGENTS.md
+.omo
+node_modules
+*.vsix

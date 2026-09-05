@@ -2,10 +2,11 @@ const vscode = require('vscode');
 
 const COMPILE_COMMAND_ID = 'amxxPawnAllIn.compileCurrentFile';
 
-function registerLazyCompilerIntegration(context) {
+function registerLazyCompilerIntegration(context, options = {}) {
     let proxyCommand = null;
     let fullIntegration = null;
     let pendingIntegration = null;
+    const integrationOptions = options;
 
     const ensureCompilerIntegration = async () => {
         if (fullIntegration) return fullIntegration;
@@ -17,7 +18,7 @@ function registerLazyCompilerIntegration(context) {
                 proxyCommand.dispose();
                 proxyCommand = null;
             }
-            fullIntegration = registerCompilerIntegration(context);
+            fullIntegration = registerCompilerIntegration(context, integrationOptions);
             return fullIntegration;
         }).finally(() => {
             pendingIntegration = null;

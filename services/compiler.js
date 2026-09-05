@@ -40,6 +40,7 @@ const IGNORED_COMPILER_SEARCH_DIRS = new Set([
 ]);
 const MAX_PROJECT_COMPILER_SEARCH_DEPTH = 4;
 const activeCompileJobs = new Map();
+let programmaticIncludePathsGetter = null;
 const { t } = createRuntimeLocalization(vscode);
 const {
     normalizeExtensionList,
@@ -592,6 +593,9 @@ function collectConfiguredCompilerIncludeDirectories(sourceFilePath = '') {
         path,
         sourceFilePath,
         projectLocalIncludePaths: compilerSettings.projectLocalIncludePaths,
+        programmaticIncludePaths: typeof programmaticIncludePathsGetter === 'function'
+            ? (programmaticIncludePathsGetter() || [])
+            : [],
         globalIncludePaths: compilerSettings.globalIncludePaths,
         normalizeFsPath: normalizeCompilerFsPath
     });
@@ -749,7 +753,10 @@ function decodeCompilerChunk(chunk) {
     return bestText;
 }
 
-function registerCompilerIntegration(context) {
+function registerCompilerIntegration(context, options = {}) {
+    programmaticIncludePathsGetter = typeof options.getProgrammaticIncludePaths === 'function'
+        ? options.getProgrammaticIncludePaths
+        : null;
     refreshCompilerSettings();
     const outputChannel = vscode.window.createOutputChannel(COMPILER_OUTPUT_CHANNEL_NAME);
     const diagnosticCollection = vscode.languages.createDiagnosticCollection(COMPILER_DIAGNOSTIC_COLLECTION_ID);

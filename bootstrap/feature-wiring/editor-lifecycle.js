@@ -7,7 +7,8 @@ function buildEditorLifecycleFeature(deps, support, liveValidationRuntime) {
         path,
         context,
         liveValidationCollection,
-        liveValidationOutputChannel
+        liveValidationOutputChannel,
+        programmaticIncludePathsService
     } = deps;
     const {
         settingsRuntime,
@@ -128,7 +129,8 @@ function buildEditorLifecycleFeature(deps, support, liveValidationRuntime) {
         liveValidationTimers,
         getDocumentFingerprint,
         parsePreprocessorDirectiveLine,
-        liveValidationOutputChannel
+        liveValidationOutputChannel,
+        programmaticIncludePathsService
     });
 }
 
