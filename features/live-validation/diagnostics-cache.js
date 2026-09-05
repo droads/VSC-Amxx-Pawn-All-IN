@@ -358,6 +358,7 @@ function createLiveDiagnosticsCache(deps) {
             `includeExt:${(settingsService?.getIncludeFileExtensions?.() || []).join(',')}`,
             `globalPaths:${(settingsService?.getGlobalIncludePaths?.() || []).join('|')}`,
             `projectPaths:${(settingsService?.getProjectLocalIncludePaths?.() || []).join('|')}`,
+            `programmaticPaths:${(settingsService?.getProgrammaticIncludePaths?.() || []).join('|')}`,
             `lang:${vscode?.env?.language || ''}`
         ].join('|');
     }

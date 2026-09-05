@@ -5,6 +5,7 @@ const { registerAmxxBuilderIntegration } = require('../services/amxx-builder');
 const { createDebugOutputChannel } = require('../services/debug-output');
 const { createLazyRuntimeTranslator } = require('../services/localization-lazy');
 const { createSettingsService } = require('../services/settings');
+const { createProgrammaticIncludePathsService } = require('../services/programmatic-include-paths');
 const { buildLazyActivationRuntime } = require('./build-lazy-runtime');
 const { registerActivationGuard } = require('./activation-guard');
 const { warnAboutConflictingAmxxPawnExtensions } = require('./extension-conflicts');
@@ -16,7 +17,10 @@ function activate(context) {
     const t = createLazyRuntimeTranslator(vscode);
     const state = createActivationState();
 
-    registerLazyCompilerIntegration(context);
+    const programmaticIncludePathsService = createProgrammaticIncludePathsService();
+    registerLazyCompilerIntegration(context, {
+        getProgrammaticIncludePaths: () => programmaticIncludePathsService.getProgrammaticIncludePaths()
+    });
     registerAmxxBuilderIntegration(context);
 
     const settingsService = createSettingsService(vscode);
@@ -49,6 +53,7 @@ function activate(context) {
         context,
         t,
         settingsService,
+        programmaticIncludePathsService,
         liveValidationCollection,
         liveValidationOutputChannel: liveValidationDebugOutputChannel,
         state
@@ -65,6 +70,14 @@ function activate(context) {
     documentHighlightFeature.register(context);
     pawnDocFeature.register(context);
     manualFunctionBodyFeature.register(context);
+
+    return {
+        setIncludePaths: (...args) => programmaticIncludePathsService.setIncludePaths(...args),
+        clearIncludePaths: (...args) => programmaticIncludePathsService.clearIncludePaths(...args),
+        getIncludePaths: (...args) => programmaticIncludePathsService.getIncludePaths(...args),
+        getProgrammaticIncludePaths: () => programmaticIncludePathsService.getProgrammaticIncludePaths(),
+        onDidChangeIncludePaths: (...args) => programmaticIncludePathsService.onDidChangeIncludePaths(...args)
+    };
 }
 
 exports.activate = activate;

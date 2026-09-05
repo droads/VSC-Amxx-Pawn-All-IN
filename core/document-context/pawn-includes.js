@@ -46,6 +46,7 @@ function createDocumentIncludeSystem(deps) {
         path,
         getGlobalIncludePaths,
         getProjectLocalIncludePaths,
+        getProgrammaticIncludePaths = () => [],
         getIncludeFileExtensions,
         normalizeFsPath,
         resolvedIncludePathCache,
@@ -170,10 +171,14 @@ function createDocumentIncludeSystem(deps) {
     function getSearchPathCacheSettingsSignature() {
         const projectHintsSignature = getProjectIncludeHintsRawSignature();
         const globalPathsSignature = getRawPathListSignature(getGlobalIncludePaths() || []);
+        const programmaticPathsSignature = getRawPathListSignature(
+            typeof getProgrammaticIncludePaths === 'function' ? (getProgrammaticIncludePaths() || []) : []
+        );
         const extensionSignature = getIncludeResolutionExtensionSignature();
         const rawSignature = [
             projectHintsSignature,
             globalPathsSignature,
+            programmaticPathsSignature,
             extensionSignature
         ].join('\0');
         if (searchPathCacheSettingsSignatureCache?.rawSignature === rawSignature) {
@@ -182,6 +187,7 @@ function createDocumentIncludeSystem(deps) {
         const value = [
             `project:${projectHintsSignature}`,
             `global:${globalPathsSignature}`,
+            `programmatic:${programmaticPathsSignature}`,
             `ext:${extensionSignature}`
         ].join('::');
         searchPathCacheSettingsSignatureCache = { rawSignature, value };
@@ -437,6 +443,19 @@ function createDocumentIncludeSystem(deps) {
             normalizeFsPath,
             getSourceKind: getIncludeSourceKind
         });
+    }
+
+    function getConfiguredProgrammaticIncludeSources(docFilePath = '') {
+        return collectConfiguredGlobalIncludeSourcesCore(
+            (typeof getProgrammaticIncludePaths === 'function' ? getProgrammaticIncludePaths() : []) || [],
+            docFilePath,
+            {
+                vscode,
+                path,
+                normalizeFsPath,
+                getSourceKind: getIncludeSourceKind
+            }
+        );
     }
 
     function getConfiguredProjectIncludeHints() {
@@ -955,6 +974,7 @@ function createDocumentIncludeSystem(deps) {
         const projectSources = getCachedProjectIncludeSourceGroups(docFilePath);
         const results = mergeUniqueSources(
             projectSources.exactSources,
+            getConfiguredProgrammaticIncludeSources(docFilePath),
             getConfiguredGlobalIncludeSources(docFilePath),
             projectSources.discoveredSources
         );

@@ -21,7 +21,8 @@ function buildLiveValidationFeature(deps, support) {
         getIncludeFileExtensions,
         getPersistentIncludeDeclarationCacheMaxBytes,
         getGlobalIncludePaths,
-        getProjectLocalIncludePaths
+        getProjectLocalIncludePaths,
+        getProgrammaticIncludePaths
     } = settingsRuntime;
     const {
         liveValidationTimers,
@@ -152,7 +153,8 @@ function buildLiveValidationFeature(deps, support) {
             getPawnFileExtensions,
             getIncludeFileExtensions,
             getGlobalIncludePaths,
-            getProjectLocalIncludePaths
+            getProjectLocalIncludePaths,
+            getProgrammaticIncludePaths
         },
         getLiveValidationFullCacheKey,
         getPawnDocumentContext,

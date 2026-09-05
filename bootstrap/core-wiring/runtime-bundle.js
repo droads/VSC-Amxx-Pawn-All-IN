@@ -1,4 +1,4 @@
-function createSettingsRuntime(settingsService) {
+function createSettingsRuntime(settingsService, programmaticIncludePathsService) {
     return {
         CONFIG_KEYS: settingsService.CONFIG_KEYS,
         SETTINGS_REFRESH_CONFIG_KEYS: settingsService.SETTINGS_REFRESH_CONFIG_KEYS,
@@ -29,7 +29,12 @@ function createSettingsRuntime(settingsService) {
         isPersistentIncludeDeclarationCacheEnabled: settingsService.isPersistentIncludeDeclarationCacheEnabled,
         getPersistentIncludeDeclarationCacheMaxBytes: settingsService.getPersistentIncludeDeclarationCacheMaxBytes,
         getGlobalIncludePaths: settingsService.getGlobalIncludePaths,
-        getProjectLocalIncludePaths: settingsService.getProjectLocalIncludePaths
+        getProjectLocalIncludePaths: settingsService.getProjectLocalIncludePaths,
+        getProgrammaticIncludePaths: () => (
+            typeof programmaticIncludePathsService?.getProgrammaticIncludePaths === 'function'
+                ? (programmaticIncludePathsService.getProgrammaticIncludePaths() || [])
+                : []
+        )
     };
 }
 
@@ -238,7 +243,7 @@ function createSharedRuntimeBundle(sources) {
 
 function createCoreRuntimeBundle(sources) {
     return {
-        settingsRuntime: createSettingsRuntime(sources.settingsService),
+        settingsRuntime: createSettingsRuntime(sources.settingsService, sources.programmaticIncludePathsService),
         stateRuntime: createStateRuntime(sources.state),
         cacheRuntime: createCacheRuntime(sources.documentSystemRuntime, sources.documentStateRuntime),
         sharedRuntime: createSharedRuntimeBundle(sources)
